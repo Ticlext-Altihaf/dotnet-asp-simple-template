@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Reflection;
 
 namespace BozoAIAggregator.Utility;
 
@@ -11,4 +12,13 @@ internal class BuildDateAttribute : Attribute
     }
 
     public DateTime DateTime { get; }
+
+    public static DateTime GetBuildDate()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        const string buildVersionMetadataPrefix = "+build";
+        var attribute = assembly.GetCustomAttribute<BuildDateAttribute>();
+        if (attribute?.DateTime == null) return default;
+        return attribute.DateTime;
+    }
 }

@@ -1,4 +1,5 @@
 ﻿
+using System.Net;
 using BozoAIAggregator;
 using BozoAIAggregator.Data;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +29,6 @@ var possibleAppSettingLocations = new[]
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
 
-
 foreach (var possibleAppSettingLocation in possibleAppSettingLocations)
 {
     if (File.Exists(possibleAppSettingLocation))
@@ -53,6 +53,7 @@ builder.Services.RegisterAssemblyPublicNonGenericClasses()
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
