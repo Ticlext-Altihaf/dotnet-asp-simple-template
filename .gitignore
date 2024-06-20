@@ -216,3 +216,4 @@ FodyWeavers.xsd
 .vscode
 .idea
 appsettings.json
+*BozoAIAggregator.db
