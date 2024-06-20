@@ -8,4 +8,7 @@ public class Configuration
     public string AzureOpenChatDeploymentId { get; set; }
     public string AzureOpenEmbeddingsDeploymentId { get; set; }
     public string ChromaDBEndpoint { get; set; }
+    public string Neo4jEndpoint { get; set; }
+    public string Neo4jUser { get; set; }
+    public string Neo4jPassword { get; set; }
 }
