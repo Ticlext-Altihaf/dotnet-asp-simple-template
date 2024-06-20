@@ -7,4 +7,5 @@ public class Configuration
     public string AzureOpenaiKey { get; set; }
     public string AzureOpenChatDeploymentId { get; set; }
     public string AzureOpenEmbeddingsDeploymentId { get; set; }
+    public string ChromaDBEndpoint { get; set; }
 }

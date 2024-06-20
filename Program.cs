@@ -25,7 +25,7 @@ var possibleAppSettingLocations = new[]
 
 
 
-var builder = Host.CreateApplicationBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
 
 
@@ -45,12 +45,25 @@ builder.Services.Configure<Configuration>(builder.Configuration);
 
 
 
+
 // Register any class that ends with "Service" as a service
 builder.Services.RegisterAssemblyPublicNonGenericClasses()
     .Where(c => c.Name.EndsWith("Service"))
     .AsPublicImplementedInterfaces();
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+var app = builder.Build();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
-var host = builder.Build();
 
 
-await host.RunAsync();
+app.UseAuthorization();
+
+app.MapControllers();
+
+await app.RunAsync();
