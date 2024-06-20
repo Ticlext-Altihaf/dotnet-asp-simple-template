@@ -1,5 +1,6 @@
 ﻿
 using BozoAIAggregator;
+using BozoAIAggregator.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,7 +8,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NetCore.AutoRegisterDi;
-
 
 
 var currentDirectory = Directory.GetCurrentDirectory();
@@ -42,7 +42,7 @@ builder.Logging.AddConsole();
 builder.Configuration.AddEnvironmentVariables();
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 builder.Services.Configure<Configuration>(builder.Configuration);
-
+builder.Services.AddDbContext<DatabaseContext>();
 
 
 
