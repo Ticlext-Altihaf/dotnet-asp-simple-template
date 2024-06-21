@@ -12,7 +12,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.KernelMemory;
 using Microsoft.SemanticKernel;
+using Neo4j.KernelMemory.MemoryStorage;
 using NetCore.AutoRegisterDi;
 
 
@@ -70,6 +72,37 @@ var openAiClient = new OpenAIClient(new Uri(azureOpenaiEndpoint), new AzureKeyCr
 builder.Services.AddAzureOpenAIChatCompletion(azureOpenChatDeploymentId, openAiClient);
 #pragma warning disable SKEXP0001, SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future releases.
 builder.Services.AddAzureOpenAITextEmbeddingGeneration(azureOpenEmbeddingsDeploymentId, openAiClient);
+
+
+builder.AddKernelMemory(kmBuilder =>
+    {
+        // Configure Kernel Memory here if needed
+        kmBuilder
+            .WithNeo4j(new Neo4jConfig()
+            {
+                Uri = builder.Configuration["Neo4jEndpoint"] ?? throw new Exception("Neo4jEndpoint must be set in the configuration."),
+                Username = builder.Configuration["Neo4jUser"] ?? throw new Exception("Neo4jUser must be set in the configuration."),
+                Password = builder.Configuration["Neo4jPassword"] ?? throw new Exception("Neo4jPassword must be set in the configuration.")
+            })
+
+            .WithAzureOpenAITextEmbeddingGeneration(new AzureOpenAIConfig()
+            {
+                APIKey = azureOpenaiKey,
+                APIType = AzureOpenAIConfig.APITypes.EmbeddingGeneration,
+                Auth = AzureOpenAIConfig.AuthTypes.APIKey,
+                Endpoint = azureOpenaiEndpoint,
+                Deployment = azureOpenEmbeddingsDeploymentId
+            })
+            .WithAzureOpenAITextGeneration(new AzureOpenAIConfig()
+            {
+                APIKey = azureOpenaiKey,
+                APIType = AzureOpenAIConfig.APITypes.ChatCompletion,
+                Auth = AzureOpenAIConfig.AuthTypes.APIKey,
+                Endpoint = azureOpenaiEndpoint,
+                Deployment = azureOpenChatDeploymentId
+            });
+    }
+);
 
 // Register any class that ends with "Service" as a service
 builder.Services.RegisterAssemblyPublicNonGenericClasses()

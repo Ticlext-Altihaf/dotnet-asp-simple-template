@@ -20,9 +20,12 @@
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+        <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.64.240619.1" />
+        <PackageReference Include="Microsoft.KernelMemory.Service.AspNetCore" Version="0.64.240619.1" />
         <PackageReference Include="Microsoft.SemanticKernel" Version="1.15.0" />
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />
         <PackageReference Include="Neo4j.Driver" Version="5.21.0" />
+        <PackageReference Include="Neo4j.KernelMemory.MemoryStorage" Version="0.1.0" />
         <PackageReference Include="NetCore.AutoRegisterDi" Version="2.2.1" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
     </ItemGroup>
