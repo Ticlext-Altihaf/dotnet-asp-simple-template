@@ -1,3 +1,4 @@
+using System.Runtime.Serialization;
 using Microsoft.Extensions.Options;
 using Microsoft.KernelMemory;
 
@@ -7,7 +8,7 @@ public class IndexerService : IHostedService
 {
     private readonly ILogger<IndexerService> _logger;
     private readonly IOptions<Configuration> _configuration;
-    private readonly Queue<Func<Task>> _indexQueue = new();
+    private readonly Queue<TaskSerializable> _indexQueue = new();
     private readonly IKernelMemory _kernelMemory;
     private bool _isRunning;
     public IndexerService(ILogger<IndexerService> logger, IOptions<Configuration> configuration, IKernelMemory kernelMemory)
@@ -19,10 +20,7 @@ public class IndexerService : IHostedService
 
     public void AddWebScrappingTask(Uri uri)
     {
-        _indexQueue.Enqueue(async () =>
-        {
-            await _kernelMemory.ImportWebPageAsync(uri.ToString());
-        });
+        _indexQueue.Enqueue(new WebScrappingTask(uri));
     }
 
 
@@ -39,7 +37,17 @@ public class IndexerService : IHostedService
             }
 
             var task = _indexQueue.Dequeue();
-            await task();
+            switch (task)
+            {
+                case WebScrappingTask webScrappingTask:
+                    _logger.LogInformation($"IndexerService: Processing WebScrappingTask for {webScrappingTask.Uri}");
+                    await _kernelMemory.ImportWebPageAsync(webScrappingTask.Uri.ToString(),
+                        cancellationToken: cancellationToken);
+                    break;
+                default:
+                    _logger.LogError($"IndexerService: Unknown task type {task.TaskType}");
+                    break;
+            }
         }
     }
 
@@ -47,5 +55,33 @@ public class IndexerService : IHostedService
     {
         _isRunning = false;
         return Task.CompletedTask;
+    }
+
+    private abstract class TaskSerializable : ISerializable
+    {
+        public string TaskType { get; }
+
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("TaskType", TaskType);
+
+        }
+    }
+
+    private class WebScrappingTask : TaskSerializable
+    {
+        public Uri Uri { get; set; }
+        public string TaskType => "WebScrappingTask";
+        public WebScrappingTask(Uri uri)
+        {
+            Uri = uri;
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue("Uri", Uri);
+        }
     }
 }
